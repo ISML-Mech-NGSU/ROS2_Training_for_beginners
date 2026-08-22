@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROS実習</title>
+<style>
+:root {
+  --ink:#172033; --muted:#667085; --line:#e4e7ec; --paper:#ffffff; --bg:#f6f8fb;
+  --accent:#1261a0; --accent2:#0b7a75; --code:#101828; --code2:#1d2939;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Sans",Meiryo,sans-serif;color:var(--ink);background:var(--bg);line-height:1.72}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+aside{position:sticky;top:0;height:100vh;overflow:auto;background:#0f2740;color:#fff;padding:28px 18px}
+.brand{font-size:24px;font-weight:750;margin:0 10px 24px}
+.brand small{display:block;font-size:12px;font-weight:500;opacity:.7;margin-top:4px}
+.nav-chapter{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;margin:22px 10px 8px}
+aside a{display:flex;gap:10px;align-items:flex-start;color:#eaf2f8;text-decoration:none;padding:8px 10px;border-radius:8px;font-size:13px;line-height:1.4}
+aside a:hover{background:rgba(255,255,255,.09)}
+aside a span{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,.12);font-size:11px}
+main{max-width:1080px;width:100%;margin:0 auto;padding:54px 54px 100px}
+.hero{background:linear-gradient(135deg,#102b48,#195d87);color:#fff;border-radius:20px;padding:44px;margin-bottom:28px;box-shadow:0 14px 40px rgba(16,43,72,.18)}
+.hero h1{font-size:42px;line-height:1.2;margin:0 0 12px}
+.hero p{margin:0;opacity:.85;font-size:17px}
+.lesson{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px 38px;margin:0 0 24px;box-shadow:0 5px 18px rgba(16,24,40,.045);scroll-margin-top:20px}
+.slide-tag{display:inline-block;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+h2{font-size:29px;line-height:1.32;margin:0 0 22px}
+h3{font-size:16px;margin:26px 0 9px}
+.lead{font-size:18px;color:#344054}
+.steps{padding-left:1.25em;margin:0}
+.steps li{margin:.35em 0}
+.code-card{border-radius:12px;overflow:hidden;background:var(--code);margin:10px 0 18px;box-shadow:0 5px 15px rgba(16,24,40,.12)}
+.code-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--code2);color:#d0d5dd;font-size:12px}
+.copy-btn{border:1px solid #475467;background:#344054;color:#fff;border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px}
+.copy-btn:hover{background:#475467}
+pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-card pre{padding:17px 18px;color:#f9fafb;font:14px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+.code-card pre code::before{content:"$ ";color:#75e0a7}.python-head+pre code::before{content:""}
+.code-card .code-head span:has(+ .copy-btn){font-weight:650}
+.tree{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px 18px;font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.reference{margin:28px 0 0;border-top:1px solid var(--line);padding-top:24px}
+.reference img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px}
+.reference figcaption{font-size:12px;color:var(--muted);margin-top:7px;text-align:center}
+.detail{margin-top:18px;background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.detail summary{cursor:pointer;font-weight:650}
+footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
+@media (max-width:900px){
+  .layout{display:block}
+  aside{position:relative;height:auto;padding:18px}
+  aside nav{display:none}
+  main{padding:24px 14px 60px}
+  .hero{padding:28px 22px}
+  .hero h1{font-size:34px}
+  .lesson{padding:25px 20px}
+}
+@media print{
+  aside{display:none}
+  .layout{display:block}
+  main{max-width:none;padding:0}
+  .hero{box-shadow:none;border-radius:0}
+  .lesson{break-inside:avoid;box-shadow:none}
+  .copy-btn{display:none}
+}
+
+/* PowerPointの箇条書き階層を反映 */
+.ppt-outline{list-style:none;padding-left:0;margin:0 0 14px}
+.ppt-outline li{position:relative;margin:.42em 0;padding-left:1.15em}
+.ppt-outline li::before{content:"•";position:absolute;left:0;color:#344054}
+.ppt-outline .lvl-1{margin-left:1.65em;font-size:.97em}
+.ppt-outline .lvl-1::before{content:"◦";color:#667085}
+.ppt-outline .lvl-2{margin-left:3.3em;font-size:.95em}
+.ppt-outline .lvl-2::before{content:"▪";color:#98a2b3}
+.ppt-outline .lvl-3{margin-left:4.95em;font-size:.93em}
+.ppt-outline .lvl-3::before{content:"–";color:#98a2b3}
+.command-indent-1{margin-left:1.65em}
+.command-indent-2{margin-left:3.3em}
+@media(max-width:700px){
+  .ppt-outline .lvl-1{margin-left:1em}
+  .ppt-outline .lvl-2{margin-left:2em}
+  .ppt-outline .lvl-3{margin-left:3em}
+  .command-indent-1{margin-left:1em}
+  .command-indent-2{margin-left:2em}
+}
+
+
+/* 図を本文の一部として組み込む */
+.figure-card{
+  margin:22px 0 4px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+}
+.figure-card img{
+  display:block;
+  max-width:100%;
+  width:auto;
+  height:auto;
+  margin:0 auto;
+}
+.figure-card figcaption{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:12px;
+  text-align:center;
+}
+.ros-version-table{
+  width:100%;
+  border-collapse:collapse;
+  margin:20px 0 8px;
+  font-size:14px;
+}
+.ros-version-table th,.ros-version-table td{
+  border:1px solid var(--line);
+  padding:11px 12px;
+  text-align:center;
+  vertical-align:middle;
+}
+.ros-version-table th{
+  background:#eef2f6;
+  font-weight:700;
+}
+@media(min-width:880px){
+  #slide-5 .figure-card{max-width:560px;margin-left:auto;margin-right:auto}
+  #slide-9 .figure-card,#slide-10 .figure-card,#slide-11 .figure-card{max-width:900px;margin-left:auto;margin-right:auto}
+}
+
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="brand">ROS実習<small>受講生用 Web ハンドアウト</small></div>
+  <nav><div class="nav-chapter">導入</div>
+    <a href="#slide-1"><span>1</span>目的と内容</a>
+    <a href="#slide-2"><span>2</span>実習使用環境</a>
+    <a href="#slide-3"><span>3</span>ROS2のバージョン</a>
+    <a href="#slide-4"><span>4</span>ROS2関連パッケージの追加インストール（済み）</a>
+    <a href="#slide-5"><span>5</span>実習内容</a><div class="nav-chapter">実習1：ROS 2コマンド</div>
+    <a href="#slide-6"><span>6</span>起動からNode確認</a>
+    <a href="#slide-7"><span>7</span>Topicの確認</a>
+    <a href="#slide-8"><span>8</span>ServiceとAction</a>
+    <a href="#slide-9"><span>9</span>rqtグラフィカル表示</a>
+    <a href="#slide-10"><span>10</span>Topicとは</a>
+    <a href="#slide-11"><span>11</span>Serviceとは</a>
+    <a href="#slide-12"><span>12</span>Actionとは</a>
+    <a href="#slide-13"><span>13</span>Serviceを動かす</a>
+    <a href="#slide-14"><span>14</span>Actionを動かす</a>
+    <div class="nav-chapter">実習2：Pythonコード</div>
+    <a href="#slide-15"><span>15</span>実習内容</a>
+    <a href="#slide-16"><span>16</span>Packageとは、</a>
+    <a href="#slide-17"><span>17</span>Packageの作成（実習２では作成済み）</a>
+    <a href="#slide-18"><span>18</span>pose_sbscriber.pyを開く</a>
+    <a href="#slide-19"><span>19</span>pose_subscriber.pyの解説、および作業</a>
+    <a href="#slide-20"><span>20</span>pose_subscriber.pyの実行</a>
+    <a href="#slide-21"><span>21</span>velocity_publisher.pyを開く</a>
+    <a href="#slide-22"><span>22</span>velocity_publisher.pyの解説と作業 </a>
+    <a href="#slide-23"><span>23</span>velocity_publisher.pyの実行</a>
+    <a href="#slide-24"><span>24</span>wall_avoidance.pyを開く</a>
+    <a href="#slide-25"><span>25</span>wall_avoidance.pyの解説</a>
+    <a href="#slide-26"><span>26</span>wall_avoidance.pyの実行と課題</a>
+    <a href="#slide-27"><span>27</span>補足：MATLAB/SimulinkとROS2</a>
+  </nav>
+</aside>
+<main>
+  <header class="hero">
+    <h1>ROS 2実習</h1>
+    <p>turtlesim で ROS 2 の通信を確認し、Python で Subscriber / Publisher を作成します。コマンド欄はそのままコピーできます。</p>
+  </header>
+
+  <section id="slide-1" class="lesson"><div class="slide-tag">Slide 1</div><h2>目的と内容</h2>
+    <p class="lead">ROSの操作と簡単なPythonプログラム作成に触れてもらい、ROSの概要を学んでもらいます。<br>
+       題材として、turtlesim という既存のコマンドでカメが動き回るプログラムを用いて、まずはコマンド操作からカメの操作を行います。<br>
+       この後、Python による Subscriber / Publisher のプログラム作成までを体験します。</p>
+  </section>
+
+  <section id="slide-2" class="lesson"><div class="slide-tag">Slide 2</div><h2>実習使用環境</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">使用PC：	Raspberry Pi 5 8GB</li>
+      <li class="lvl-1">Broadcom BCM2712、2.4 GHz quad-core 64 bit Arm Cortex-A76 CPU（512KB L2キャッシュ/2MB 共有L3キャッシュ）</li>
+      <li class="lvl-1">VideoCore VII GPU、supporting OpenGL ES 3.1、Vulkan 1.2</li>
+      <li class="lvl-1">8 GB LPDDR4X-4267 SDRAM</li>
+      <li class="lvl-0">使用OS：Ubuntu 24.04LTS（Desktop）</li>
+      <li class="lvl-1">Raspberry Pi ImagerでSDカードに書き込んでインストール</li>
+      <li class="lvl-1"><a href="https://www.raspberrypi.com/software/" target="_blank" rel="noopener">https://www.raspberrypi.com/software/</a></li>
+      <li class="lvl-0">使用エディタ：VS code</li>
+      <li class="lvl-1"><a href="https://code.visualstudio.com/docs/setup/linux" target="_blank" rel="noopener">https://code.visualstudio.com/docs/setup/linux</a></li>
+      <li class="lvl-0">使用言語：<strong>Python</strong>（ Ubuntu 24.04に標準でインストール済み）</li>
+    </ul>
+  </section>
+  
+  <section id="slide-3" class="lesson"><div class="slide-tag">Slide 3</div><h2>ROS 2のバージョン</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">開発世代ごとのバージョンあり</li>
+      <li class="lvl-1">OS環境や周辺ツールの対応状況や、使用したいROSパッケージの対応状況などから選択する必要あり</li>
+      <li class="lvl-0">今回は、<strong>ROS 2</strong> Jazzy Jaliscoをインストール済み</li>
+      <li class="lvl-1"><strong>ROS 2</strong> Jazzyのinstall（https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html）</li>
+    </ul>
+    <table class="ros-version-table" aria-label="ROS 2 バージョン比較">
+      <thead>
+        <tr>
+          <th>ROS 2 Lyrical Luth</th>
+          <th>ROS 2 Jazzy Jalisco</th>
+          <th>ROS 2 Humble Hawksbill</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ubuntu Linux 26.04, Windows 11<br><small>Latest ROS 2 long-term release</small></td>
+          <td>Ubuntu Linux 24.04, Windows 10<br><small>Active ROS 2 long-term release</small></td>
+          <td>Ubuntu Linux 22.04, Windows 10<br><small>Best upgrade path for ROS 1 users</small></td>
+        </tr>
+        <tr>
+          <td>—</td>
+          <td>MATLAB R2025a ～ R2026a</td>
+          <td>MATLAB R2023b ～ R2024b</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  
+  <section id="slide-4" class="lesson"><div class="slide-tag">Slide 4</div><h2>ROS 2関連パッケージの追加インストール（済み）</h2>
+    これらは、すでに実行済です。参考までに記載しておくだけです。
+    <h3>turtlesim のインストール</h3>
+    今回実習の題材とするTurtlesimのインストール方法<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="sudo apt install ros-jazzy-turtlesim">コピー</button></div>
+      <pre><code>sudo apt install ros-jazzy-turtlesim</code></pre>
+    </div>
+    <h3>RQT のインストール</h3>
+    ROS 2の可視化を行うGUIツール"RQT"のインストール方法<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="sudo apt install &#x27;ros-jazzy-rqt*&#x27;">コピー</button></div>
+      <pre><code>sudo apt install &#x27;ros-jazzy-rqt*&#x27;</code></pre>
+    </div>
+    <h3>ROS 2 環境の読み込み設定</h3>
+    ROS 2のコマンドやパッケージをターミナルから使用するには、ROS 2の環境設定を読み込む必要があります。毎回手動で読み込まなくてもよいように、初期設定ファイル .bashrc に設定を追加します。<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="echo &quot;source /opt/ros/jazzy/setup.bash&quot; &gt;&gt; ~/.bashrc">コピー</button></div>
+      <pre><code>echo &quot;source /opt/ros/jazzy/setup.bash&quot; &gt;&gt; ~/.bashrc</code></pre>
+    </div>
+    <h3>Python 開発環境</h3>
+    Pythonを使ってROS 2のプログラムを開発するためのツールのインストール<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="sudo apt install python3-colcon-common-extensions python3-rosdep python3-vcstool git -y">コピー</button></div>
+      <pre><code>sudo apt install python3-colcon-common-extensions python3-rosdep python3-vcstool git -y</code></pre>
+    </div>
+    <h3>rosdep 初期化と更新</h3>
+    ROS 2開発ツールのrosdepの初期化。rosdepとは、ROS 2 において、パッケージが動作するために必要な外部ライブラリや他のパッケージ（依存関係）を自動で探してインストールするコマンドラインツールです。
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="sudo rosdep init">コピー</button></div>
+      <pre><code>sudo rosdep init</code></pre>
+    </div>
+    rosdepの更新。これで依存関係などを最新にしておきます。
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="rosdep update">コピー</button></div>
+      <pre><code>rosdep update</code></pre>
+    </div>
+  </section>
+  
+  <section id="slide-5" class="lesson"><div class="slide-tag">Slide 5</div><h2>実習内容</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">Turtlesimとは、右図のように、windowの中にカメが出てきて、コマンドを入力すると、前後進・左右旋回を行うというものです。Window枠端にあたると衝突して止まります。</li>
+      <li class="lvl-0">実習は以下の２項目をやってもらいます</li>
+      <li class="lvl-1">実習１：TurtlesimをROS 2コマンドから動かす</li>
+      <li class="lvl-1">実習２：Pythonでコード作成して動かす。コード作成は以下の３つ</li>
+      <li class="lvl-2">カメの位置を読み取る</li><li class="lvl-2">カメに指令を入れて旋回させる</li>
+      <li class="lvl-2">カメがウィンドウ内で壁に当たらず動き回るようにする</li>
+    </ul>
+    <figure class="figure-card">
+      <img src="images/turtlesim.png" alt="turtlesim の画面">
+      <figcaption>turtlesim の画面</figcaption>
+    </figure>
+  </section>
+  
+  <section id="slide-6" class="lesson"><div class="slide-tag">Slide 6</div><h2>実習１：起動からNode確認</h2>
+  <h3>turtlesim を起動</h3>
+    新しくターミナルを開き、turtlesimを起動します<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 run turtlesim turtlesim_node">コピー</button></div>
+      <pre><code>ros2 run turtlesim turtlesim_node</code></pre>
+    </div>
+    <h3>Node を確認</h3>
+    turtlesimのnodeができていることを確認します。別のターミナルを開いて、次を実行<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 node list">コピー</button></div>
+      <pre><code>ros2 node list</code></pre>
+    </div>
+    <h3>キーボード操作 Node を起動</h3>
+    キーボードでカメを動かすNodeを起動します。ターミナルで次を実行<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 run turtlesim turtle_teleop_key">コピー</button></div>
+      <pre><code>ros2 run turtlesim turtle_teleop_key</code></pre>
+    </div>
+    <h3>Node を再確認</h3>
+    新しく、別のターミナルを開いて、Nodeを確認します。起動したNodeがあることを確認しましょう。
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 node list">コピー</button></div>
+      <pre><code>ros2 node list</code></pre>
+    </div>
+    
+  </section>
+  
+  <section id="slide-7" class="lesson"><div class="slide-tag">Slide 7</div><h2>実習１：Topicの確認</h2>
+    <h3>Topic 一覧</h3>
+    現在、動作しているTopicの一覧を確認します<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 topic list">コピー</button></div>
+      <pre><code>ros2 topic list</code></pre>
+    </div>
+    <h3>Message type を確認</h3>
+    /turtle1/poseを例として、このTopicのtypeを確認します<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 topic type /turtle1/pose">コピー</button></div>
+      <pre><code>ros2 topic type /turtle1/pose</code></pre>
+    </div><h3>Message を表示</h3>
+    Topicに流れている、Messageの内容を見てみる。画面が止まって見えるかもしれませんが、連続してMessageの内容が出力されています。<br>
+    teleop_keyを起動しているターミナルで、矢印キー（カーソルキー）でカメを動かして、Messageの内容が変わることを確認する。<br>
+    出力停止はctrl-cキーを押す。<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 topic echo /turtle1/pose">コピー</button></div>
+      <pre><code>ros2 topic echo /turtle1/pose</code></pre>
+    </div>
+    <h3>pose の通信状態</h3>
+    Topicの通信状態（PublisherとSubscriberの数）を確認する.<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 topic info /turtle1/pose">コピー</button></div>
+      <pre><code>ros2 topic info /turtle1/pose</code></pre>
+    </div>
+    <h3>cmd_vel の通信状態</h3>
+    cmd_velの通信状態を見てみる<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 topic info /turtle1/cmd_vel">コピー</button></div>
+      <pre><code>ros2 topic info /turtle1/cmd_vel</code></pre>
+    </div>
+  </section>
+  <section id="slide-8" class="lesson"><div class="slide-tag">Slide 8</div><h2>実習１：ServiceとActionの確認</h2>
+    <h3>Topic以外も見てみる</h3>
+    "Service"の状態<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 service list">コピー</button></div>
+      <pre><code>ros2 service list</code></pre>
+    </div>
+    "Action"の状態<br>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 action list">コピー</button></div>
+      <pre><code>ros2 action list</code></pre>
+    </div>
+    <h3>ROSにはTopic, Service, Actionの３つの通信がある</h3>
+  </section>
+  
+  <section id="slide-9" class="lesson"><div class="slide-tag">Slide 9</div><h2>実習１：rqtでグラフィカル表示</h2>
+    <h3>rqt でグラフィカルにROSの状態を見てみる</h3>
+    新しくターミナルを開いて、"rqt"とコマンドを打つ
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="rqt">コピー</button></div>
+      <pre><code>rqt</code></pre>
+    </div>
+    メニューバーから”Plugins”→"Inspection”→"node Graph
+  </section>
+  
+  <section id="slide-10" class="lesson"><div class="slide-tag">Slide 10</div><h2>Topicとは何か</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">PublisherからSubscriberにTopicを通して、Messageを送る</li>
+      <li class="lvl-0">「１対１」、「１対多」、「多対多」</li>
+    </ul>
+    <figure class="figure-card">
+      <img src="images/Topic-SinglePublisherandSingleSubscriber.gif" alt="Topic による Publisher / Subscriber 通信">
+      <figcaption>Topic による Publisher / Subscriber 通信</figcaption>
+    </figure>
+  </section>
+
+  <section id="slide-11" class="lesson"><div class="slide-tag">Slide 11</div><h2>Serviceとは何か</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">Client側からServer側にRequestを送って、その結果をResponseとして受け取る</li>
+      <li class="lvl-0">「１対１」や「多対１」</li>
+    </ul>
+    <figure class="figure-card">
+      <img src="images/Service-SingleServiceClient.gif" alt="Service の Request / Response">
+      <figcaption>Service の Request / Response</figcaption>
+    </figure>
+  </section>
+  <section id="slide-12" class="lesson"><div class="slide-tag">Slide 12</div><h2>Actionとは何か</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">ServiceとTopicを組み合わせて、時間がかかる処理に使う</li>
+      <li class="lvl-0">Goal ServiceでClient が「やること」を依頼し、受付けたことをServer返信</li>
+      <li class="lvl-0">FeedbackTopicで状況を連絡</li>
+      <li class="lvl-0">Result Serviceで「結果の返信」をClient依頼し、終了したら「結果」をServerが返信</li>
+    </ul>
+    <figure class="figure-card">
+      <img src="images/Action-SingleActionClient.gif" alt="Action の構成（Goal Service / Feedback Topic / Result Service）">
+      <figcaption>Action の構成（Goal Service / Feedback Topic / Result Service）</figcaption>
+    </figure>
+  </section>
+
+  <section id="slide-13" class="lesson"><div class="slide-tag">Slide 13</div><h2>実習１：Serviceを動かす</h2>
+    <h3>Serviceについて、試してみる</h3>
+    サービスのTypeを調べてみる<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 service type /turtle1/set_pen">コピー</button></div>
+      <pre><code>ros2 service type /turtle1/set_pen</code></pre>
+    </div>
+    Serviceの interfaceを調べてみる<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 interface show turtlesim/srv/SetPen">コピー</button></div>
+      <pre><code>ros2 interface show turtlesim/srv/SetPen</code></pre>
+    </div>
+    Service を実行してみる
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 service call /turtle1/set_pen turtlesim/srv/SetPen \
+  &quot;{r: 255, g: 0, b: 0, width: 5, 'off': 0}&quot;">コピー</button></div>
+      <pre><code>ros2 service call /turtle1/set_pen turtlesim/srv/SetPen \
+  &quot;{r: 255, g: 0, b: 0, width: 5, 'off': 0}&quot;</code></pre>
+    </div>
+  </section>
+  
+  <section id="slide-14" class="lesson"><div class="slide-tag">Slide 14</div><h2>実習１：Actionを動かす</h2>
+    <h3>Actionを試してみる</h3>
+    Actionの型を調べてみる<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 action list -t">コピー</button></div>
+      <pre><code>ros2 action list -t</code></pre>
+    </div>
+    Actionの interfaceを調べてみる<br>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 interface show turtlesim/action/RotateAbsolute">コピー</button></div>
+      <pre><code>ros2 interface show turtlesim/action/RotateAbsolute</code></pre>
+    </div>
+    Action を実行してみる。Feedbackも同時に表示される。<br>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 action send_goal /turtle1/rotate_absolute \
+  turtlesim/action/RotateAbsolute \
+  &quot;{theta: 1.57}&quot; \
+  --feedback">コピー</button></div>
+      <pre><code>ros2 action send_goal /turtle1/rotate_absolute \
+  turtlesim/action/RotateAbsolute \
+  &quot;{theta: 1.57}&quot; \
+  --feedback</code></pre>
+    </div>
+  </section>
+  
+  <section id="slide-15" class="lesson"><div class="slide-tag">Slide 15</div><h2>実習２：実習内容</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">SubscriberとPublisherに関して、Pythonでコード作成</li>
+      <li class="lvl-0">作成するのは以下の３つのプログラム</li>
+      <li class="lvl-1">Subscriberのサンプル：pose_subscriber.py</li>
+      <li class="lvl-2">カメの位置と姿勢を出力する</li>
+      <li class="lvl-1">Publisherのサンプル：velocity_publisher.py</li>
+      <li class="lvl-2">カメを旋回させる</li>
+      <li class="lvl-1">組み合わせのサンプル：wall_avoidance.py</li>
+      <li class="lvl-2">カメが壁に近づくと旋回して、壁に当たらないように走り続けるようにする</li>
+      <li class="lvl-0">３つのプログラムを“パッケージ”としてまとめる</li>
+    </ul>
+  </section>
+  
+  <section id="slide-16" class="lesson"><div class="slide-tag">Slide 16</div><h2>Packageとは、</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">パッケージ（<strong>Package</strong>）とは、ROS 2で関連するプログラムや設定ファイルなどをひとまとめにして管理する単位です。</li>
+      <li class="lvl-0">turtlesimもパッケージ<br>
+      "ros2 run turtlesim turtlesim_node"のコマンドは、"turtlesim"パッケージの中の、"turtlesim_node"プログラムを実行する、という意味。</li>
+      <li class="lvl-0">研修２では、turtle_controllerパッケージとして、プログラムをまとめます</li>
+    </ul>
+    <h3>今回のパッケージ構成</h3>
+    <div class="tree"><pre>turtle_controller
+    ├─ pose_subscriber.py
+    ├─ velocity_publisher.py
+    └─ wall_avoidance.py</pre>
+    </div>
+
+    <h3>”turtlesim"パッケージを調べてみる</h3>
+    Packageに含まれるプログラムを調べるには<br>
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 pkg executables turtlesim">コピー</button></div>
+      <pre><code>ros2 pkg executables turtlesim</code></pre>
+    </div>
+  </section>
+  
+  <section id="slide-17" class="lesson"><div class="slide-tag">Slide 17</div><h2>Packageの作成（実習２では雛型作成済み）</h2>
+    <h3>パッケージ作成から実行までの手順</h3>
+      <ul class='ppt-outline'>
+        <li class="lvl-0">(1) Package雛型作成：ros2 pkg create --build-type ament_python turtle_controller</li>
+        <li class="lvl-0">(2)Pythonプログラムを作成</li>
+        <li class="lvl-0">(3)プログラム登録：雛型の中にあるsetup.pyにプログラムを記載</li>
+        <li class="lvl-0">(4) パッケージをビルド：colcon build</li>
+        <li class="lvl-0">(5)ビルドしたパッケージをROS 2から実行できるようにする：source install/setup.bash</li>
+        <li class="lvl-0">(6)プログラム実行：ros2 run turtle_controller pose_subscriber</li>
+      </ul>
+    <h3>例：Package 雛型作成（作成済）</h3>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span></div>
+      <pre><code>ros2 pkg create --build-type ament_python turtle_controller</code></pre>
+    </div>
+    <h3>例：ビルド</h3>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span></div>
+      <pre><code>colcon build</code></pre>
+    </div>
+    <h3>例：現在のターミナルで有効化</h3>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span></div>
+      <pre><code>source install/setup.bash</code></pre>
+    </div>
+    <h3>例：実行</h3>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span></div>
+      <pre><code>ros2 run turtle_controller pose_subscriber</code></pre>
+    </div>
+    <details class="detail"><summary>スライド内の補足コマンド</summary>
+      実際には、依存関係などを明示してパッケージ作成
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span></div>
+      <pre><code>ros2 pkg create turtle_controller --build-type ament_python --dependencies rclpy geometry_msgs turtlesim</code></pre>
+    </div>
+    </details>
+  </section>
+  
+  <section id="slide-18" class="lesson"><div class="slide-tag">Slide 18</div><h2>実習２：pose_subscriber.pyを開く</h2>
+  </section>
+  
+  <section id="slide-19" class="lesson"><div class="slide-tag">Slide 19</div><h2>実習２：pose_subscriber.pyの解説と小課題</h2>
+
+    <h3>解説</h3>
+    <ul class="ppt-outline">
+      <li class="lvl-0">プログラムの動作</li>
+      <li class="lvl-1">① main()が呼ばれ、ROS 2を初期化する</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>def main(args=None):
+  rclpy.init(args=args)</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">② PoseSubscriber()を呼び出して、ROS 2ノードを作る</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>node = PoseSubscriber()</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-2">PoseSubscriber()の中では、最初に__init__()が呼ばれる</li>
+      <li class="lvl-2">ROS 2ノードとして初期化する</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>def __init__(self):
+  super().__init__('pose_subscriber')</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-2">/turtle1/poseを受信するSubscriberを作る</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>self.subscription = self.create_subscription(
+  Pose,
+  '/turtle1/pose',
+  self.pose_callback,
+  10
+)</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-2">Messageを受信したときに実行する処理を、pose_callback()として定義しておく</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>def pose_callback(self, msg):</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">③ __init__()が終わるとmain()に戻り、spin()でMessageの受信を待つ</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>rclpy.spin(node)</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">④ /turtle1/poseにMessageが届くと、ROS 2がpose_callback()を呼び出す</li>
+      <li class="lvl-1">⑤ pose_callback()で、受信したPose Messageの内容を処理する</li>
+    </ul>
+
+    <h3>pose_callback()に追加する Python コード</h3>
+      以下の内容を書き込むと、実行時にカメの位置（x, y）と向き（theta）がターミナルに出力されます。
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head">
+        <span>Python</span>
+      <button class="copy-btn" data-copy="self.get_logger().info(
+    f'x = {msg.x:.2f}, '
+    f'y = {msg.y:.2f}, '
+    f'theta = {msg.theta:.2f}'
+)">コピー</button>
+    </div>
+      <pre><code>self.get_logger().info(
+    f'x = {msg.x:.2f}, '
+    f'y = {msg.y:.2f}, '
+    f'theta = {msg.theta:.2f}'
+)     </code></pre>
+    </div>
+
+    <h3>VS CodeでCtrl+Sを押して、保存</h3>
+  </section>
+  
+  <section id="slide-20" class="lesson"><div class="slide-tag">Slide 20</div><h2>実習２：pose_subscriber.pyの実行 </h2>
+  
+    <h3>ビルド</h3>
+      ターミナルに戻って、buildする
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="colcon build">コピー</button></div>
+      <pre><code>colcon build</code></pre>
+    </div>
+    <h3>ターミナルのパッケージ有効化</h3>
+      エラーが出なかったら、ビルドしたパッケージを現在のターミナルから使用できるようにする
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="source ./install/setup.bash">コピー</button></div>
+      <pre><code>source ./install/setup.bash</code></pre>
+    </div>
+    <h3>Subscriber を実行</h3>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 run turtle_controller pose_subscriber">コピー</button></div>
+      <pre><code>ros2 run turtle_controller pose_subscriber</code></pre>
+    </div>
+    別のターミナルで実行中のturtle_teleop_keyからカメを動かしてみて、表示内容が変わることを確認<br>
+    <h3>停止は表示が流れ続けているターミナルをクリックして、ctrl-Cを入力</h3>
+  </section>
+  
+  <section id="slide-21" class="lesson"><div class="slide-tag">Slide 21</div><h2>実習２：velocity_publisher.pyを開く</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">VS codeの左側のEXPLORERウィンドウからsrc/turtle_controller/velocity_publisher.pyをダブルクリックして開く</li>
+    </ul>
+  </section>
+  
+  <section id="slide-22" class="lesson"><div class="slide-tag">Slide 22</div><h2>実習２：velocity_publisher.pyの解説と小課題</h2>
+    <h3>解説</h3>
+    <ul class="ppt-outline">
+      <li class="lvl-0">プログラムの動作</li>
+      <li class="lvl-1">① main()が呼ばれ、ROS 2を初期化する</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>def main(args=None):
+  rclpy.init(args=args)</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">② VelocityPublisher()を呼び出して、ROS 2ノードを作る</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>node = VelocityPublisher()</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-2">VelocityPublisher()の中では、最初に__init__()が呼ばれる</li>
+      <li class="lvl-2">ROS 2ノードとして初期化する</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>def __init__(self):
+  super().__init__('velocity_publisher')</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-2">/turtle1/cmd_velへMessageを送信するPublisherを作る</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>self.publisher = self.create_publisher(
+  Twist,
+  '/turtle1/cmd_vel',
+  10
+)</code></pre>
+  </div>
+
+  <ul class="ppt-outline">
+    <li class="lvl-2">一定時間ごとにtimer_callback()を呼び出すTimerを作る</li>
+  </ul>
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head"><span>Python</span></div>
+    <pre><code>self.timer = self.create_timer(
+  0.5,
+  self.timer_callback
+)</code></pre>
+  </div>
+
+  <ul class="ppt-outline">
+    <li class="lvl-1">③ __init__()が終わるとmain()に戻り、spin()でノードを動作させ続ける</li>
+  </ul>
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head"><span>Python</span></div>
+    <pre><code>rclpy.spin(node)</code></pre>
+  </div>
+
+  <ul class="ppt-outline">
+    <li class="lvl-1">④ Timerの時間になると、ROS 2がtimer_callback()を呼び出す</li>
+  </ul>
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head"><span>Python</span></div>
+    <pre><code>def timer_callback(self):</code></pre>
+  </div>
+
+  <ul class="ppt-outline">
+    <li class="lvl-1">⑤ timer_callback()の中でTwist Messageを作る</li>
+  </ul>
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head"><span>Python</span></div>
+    <pre><code>msg = Twist()</code></pre>
+  </div>
+
+  <ul class="ppt-outline">
+    <li class="lvl-1">⑥ Messageに前進速度と旋回角速度を設定する</li>
+  </ul>
+
+
+
+  <ul class="ppt-outline">
+    <li class="lvl-1">⑦ Twist Messageを/turtle1/cmd_velへ送信する</li>
+  </ul>
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head"><span>Python</span></div>
+    <pre><code>self.publisher.publish(msg)</code></pre>
+  </div>
+
+  <ul class="ppt-outline">
+    <li class="lvl-1">⑧ その後もspin()しているため、Timerによって④〜⑦が繰り返される</li>
+  </ul>
+
+  <h3>小課題</h3>
+
+  ⑥のtimer_callback()のMessage設定処理として、次のPythonコードを入力<br>
+
+  「# 前進速度」の下に、
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head">
+      <span>Python</span>
+      <button class="copy-btn" data-copy="msg.linear.x = 2.0">コピー</button>
+    </div>
+    <pre><code>msg.linear.x = 2.0</code></pre>
+  </div>
+
+  「# 旋回角速度」の下に、
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head">
+      <span>Python</span>
+      <button class="copy-btn" data-copy="msg.angular.z = 1.0">コピー</button>
+    </div>
+    <pre><code>msg.angular.z = 1.0</code></pre>
+  </div>
+
+  <h3>VS CodeでCtrl+Sを押して、保存</h3>
+</section>
+  
+  <section id="slide-23" class="lesson"><div class="slide-tag">Slide 23</div><h2>実習２：velocity_publisher.pyの実行</h2>
+  <h3>ビルド</h3>
+    ターミナルに戻って、buildする
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="colcon build">コピー</button></div>
+      <pre><code>colcon build</code></pre>
+    </div>
+    <h3>現在のターミナルで有効化</h3>
+      エラーが出なかったら、ビルドしたパッケージを現在のターミナルから使用できるようにする
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="source ./install/setup.bash">コピー</button></div>
+      <pre><code>source ./install/setup.bash</code></pre>
+    </div>
+    <h3>Publisher を実行</h3>
+      作成したプログラムをターミナルで実行し、カメが旋回するのを確認する
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 run turtle_controller velocity_publisher">コピー</button></div>
+      <pre><code>ros2 run turtle_controller velocity_publisher</code></pre>
+    </div>
+    <h3>停止はctrl-cキー</h3>
+  </section>
+  
+  <section id="slide-24" class="lesson"><div class="slide-tag">Slide 24</div><h2>実習２：wall_avoidance.pyを開く</h2>
+    <ul class='ppt-outline'>
+      <li class="lvl-0">VS codeの左側のEXPLORERウィンドウからsrc/turtle_controller/wall_avoidance.pyをダブルクリックして開く</li>
+    </ul>
+  </section>
+  
+  <section id="slide-25" class="lesson"><div class="slide-tag">Slide 25</div><h2>実習２：wall_avoidance.pyの解説</h2>
+  <ul class="ppt-outline">
+    <li class="lvl-0">これまで作成したSubscriberとPublisherを、一つのNodeに組み合わせます</li>
+    <li class="lvl-1">① /turtle1/poseから、現在のカメの位置を受信する</li>
+  </ul>
+
+  <div class="code-card command-indent-1">
+    <div class="code-head python-head"><span>Python</span></div>
+    <pre><code>self.subscription = self.create_subscription(
+  Pose,
+  '/turtle1/pose',
+  self.pose_callback,
+  10
+)</code></pre>
+  </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">② /turtle1/cmd_velへ、カメの速度指令を送信するPublisherを作る</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>self.publisher = self.create_publisher(
+  Twist,
+  '/turtle1/cmd_vel',
+  10
+)</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">③ /turtle1/poseを受信すると、pose_callback()が呼び出される</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>def pose_callback(self, msg):</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">④ 受信した位置から壁までの距離を調べ、カメの動きを決める</li>
+      <li class="lvl-2">壁から離れている → 直進する</li>
+      <li class="lvl-2">壁に近づいている → 旋回する</li>
+    </ul>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">⑤ 決めた速度をTwist Messageに設定する</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>cmd = Twist()</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">⑥ /turtle1/cmd_velへ速度指令を送信する</li>
+    </ul>
+
+    <div class="code-card command-indent-1">
+      <div class="code-head python-head"><span>Python</span></div>
+      <pre><code>self.publisher.publish(cmd)</code></pre>
+    </div>
+
+    <ul class="ppt-outline">
+      <li class="lvl-1">⑦ 新しいPose Messageを受信するたびに③〜⑥を繰り返す</li>
+    </ul>
+  </section>
+  
+  <section id="slide-26" class="lesson"><div class="slide-tag">Slide 26</div><h2>実習２：wall_avoidance.pyの実行と課題</h2>
+    <h3>ビルド</h3>
+      ターミナルに戻って、buildする
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="colcon build">コピー</button></div>
+      <pre><code>colcon build</code></pre>
+    </div>
+<h3>現在のターミナルで有効化</h3>
+    エラーが出なかったら、ビルドしたパッケージを現在のターミナルから使用できるようにする
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="source ./install/setup.bash">コピー</button></div>
+      <pre><code>source ./install/setup.bash</code></pre>
+    </div>
+<h3>壁回避プログラムを実行</h3>
+    カメが壁に近づくと旋回して回避することを確認
+    <div class="code-card command-indent-1">
+      <div class="code-head"><span>Terminal</span><button class="copy-btn" data-copy="ros2 run turtle_controller wall_avoidance">コピー</button></div>
+      <pre><code>ros2 run turtle_controller wall_avoidance</code></pre>
+    </div>
+    <h3>停止はctrl-Cキー</h3>
+
+    <H2>課題</H2>
+    現在のアルゴリズムでは、壁の近くで旋回を繰り返す動作に陥る場合があります<br>
+    アルゴリズムを改良して、繰り返し旋回に陥らないようにしてみてください
+  </section>
+
+  <section id="slide-27" class="lesson"><div class="slide-tag">Slide 27</div><h2>補足：MATLAB/SimulinkとROS 2 </h2>
+    <h3>MATLAB/SimulinkとROS 2</h3>
+    MATLAB/SimulinkはROSと接続することが可能です（ROS Toolboxが必要）。<br>
+    MATLABの豊富な制御、信号処理関連の関数を利用してMATLAB/SimuinkからROS 2対応のロボットを動かすことができます<br>
+    また、MATLAB/Simulinkで作ったアルゴリズムを、C言語やC++言語に変換して、実機ボード上に転送して、この上で自動ビルドすることもできます<br>
+
+    <figure class="figure-card">
+      <img src="images/ros2_and_Matlab.png" alt="MATLAB/SimulinkとROS 2連携">
+      <figcaption>MATLAB/SimulinkとROS 2連携</figcaption>
+    </figure>
+
+  </section>
+
+  <footer>Source: ros2実習準備.pptx</footer>
+</main>
+</div>
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.getAttribute('data-copy');
+    try {
+      await navigator.clipboard.writeText(text);
+      const old = btn.textContent;
+      btn.textContent = 'コピー済み';
+      setTimeout(() => btn.textContent = old, 1200);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      btn.textContent = 'コピー済み';
+      setTimeout(() => btn.textContent = 'コピー', 1200);
+    }
+  });
+});
+</script>
+</body>
+</html>
