@@ -567,7 +567,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
 
     <ul class="ppt-outline">
       <li class="lvl-2">PoseSubscriber()の中では、最初に__init__()が呼ばれる</li>
-      <li class="lvl-2">ROS 2ノードとして初期化する</li>
+      <li class="lvl-2">pose_subscriberという名前でROS 2ノードとして初期化する</li>
     </ul>
 
     <div class="code-card command-indent-1">
@@ -583,13 +583,17 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
     <div class="code-card command-indent-1">
       <div class="code-head python-head"><span>Python</span></div>
       <pre><code>self.subscription = self.create_subscription(
-  Pose,
+  Pose, 
   '/turtle1/pose',
   self.pose_callback,
   10
 )</code></pre>
     </div>
-
+  Pose:受信するメッセージの型<br>
+  '/turtle1/pose':購読するTopic名<br>
+  self.pose_callback:メッセージを受信したときに呼び出す関数を指定<br>
+  10:通信品質を指定するQoS（Quality of Service）の簡略指定です。<br>
+     ここでは「受信処理が追いつかない場合に、最新のメッセージを最大10個までキューに保持する」という意味<br>  
     <ul class="ppt-outline">
       <li class="lvl-2">Messageを受信したときに実行する処理を、pose_callback()として定義しておく</li>
     </ul>
@@ -613,8 +617,11 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
       <li class="lvl-1">⑤ pose_callback()で、受信したPose Messageの内容を処理する</li>
     </ul>
 
-    <h3>pose_callback()に追加する Python コード</h3>
-      以下の内容を書き込むと、実行時にカメの位置（x, y）と向き（theta）がターミナルに出力されます。
+    <br>
+    <h2>＃小課題＃</h2>
+    <h3>各自、pose_callback()に Python コードを追加する</h3>
+      以下の内容を書き込むと、実行時にカメの位置（x, y）と向き（theta）がターミナルに出力されます。<br>
+      Pythonはインデントでプログラムの構造が決まるので、インデント位置に気をつけてください。<br>
     <div class="code-card command-indent-1">
       <div class="code-head python-head">
         <span>Python</span>
@@ -688,7 +695,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
 
     <ul class="ppt-outline">
       <li class="lvl-2">VelocityPublisher()の中では、最初に__init__()が呼ばれる</li>
-      <li class="lvl-2">ROS 2ノードとして初期化する</li>
+      <li class="lvl-2">velocity_publisherという名前でROS 2ノードとして初期化する</li>
     </ul>
 
     <div class="code-card command-indent-1">
@@ -709,7 +716,10 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
   10
 )</code></pre>
   </div>
-
+  Twist:送信するメッセージの型<br>
+  '/turtle1/cmd_vel':PublishするTopic名<br>
+  10:通信品質を指定するQoS（Quality of Service）の簡略指定です。<br>
+     ここでは「受信処理が追いつかない場合に、最新のメッセージを最大10個までキューに保持する」という意味<br>
   <ul class="ppt-outline">
     <li class="lvl-2">一定時間ごとにtimer_callback()を呼び出すTimerを作る</li>
   </ul>
@@ -767,9 +777,9 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding-top:12px}
   <ul class="ppt-outline">
     <li class="lvl-1">⑧ その後もspin()しているため、Timerによって④〜⑦が繰り返される</li>
   </ul>
-
-  <h3>小課題</h3>
-
+<br>
+  <h2>＃小課題＃</h2>
+  <h3>各自、timer_callback()にPythonコードを書き込む</h3>
   ⑥のtimer_callback()のMessage設定処理として、次のPythonコードを入力<br>
 
   「# 前進速度」の下に、
